@@ -16,6 +16,7 @@ function Invoke-ConfigGeneration {
     $configBuildDir = Join-Path $repoRoot "$BuildRoot-config"
 
     & cmake -S $repoRoot -B $configBuildDir -G $Generator `
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 `
         2>&1 |
         ForEach-Object { Write-Host $_ }
 
@@ -67,7 +68,8 @@ function Invoke-ModBuild {
         -DANDROID_ABI="$TargetAbi" `
         -DANDROID_PLATFORM="$AndroidPlatform" `
         -DANDROID_STL="c++_shared" `
-        -DLEVI_PACKAGE_CONFIG_DIR="$generatedConfigDir"
+        -DLEVI_PACKAGE_CONFIG_DIR="$generatedConfigDir" `
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
     cmake --build $buildDir --target levi_package
 }
