@@ -1,38 +1,38 @@
-# JavaPack Bridge (LeviLauncher Edition)
+# JavaPack Bridge
 
-Run **Minecraft Java Edition resource packs** (`.zip`) directly on **Minecraft Bedrock** via **LeviLauncher** (`.levipack`) or convert them on desktop via Python CLI.
+Use **Minecraft Java Edition resource packs** on **Bedrock** (including Android
+launchers such as LeviLauncher). It converts a Java pack `.zip` or folder into a
+Bedrock `.mcpack` you can import normally.
 
-## How it works on Android (LeviLauncher)
-
-1. Download `javapack_bridge-<version>-arm64-v8a.levipack` from **Releases** (or build via GitHub Actions).
-2. Import the `.levipack` into **LeviLauncher**.
-3. Place any Java Edition resource pack `.zip` into `/sdcard/games/JavaPackBridge/packs/`.
-4. Launch Minecraft — the native C++20 mod (`libJavaPackBridge.so`) automatically converts the Java textures, animations (`.png.mcmeta`), and pack metadata into `/sdcard/games/com.mojang/resource_packs/` so you can enable it under **Settings → Global Resources**.
-5. You can also trigger an immediate re-scan anytime from the **LeviLauncher ModMenu** (`JavaPack Bridge`).
-
-## Desktop Python CLI
-
-```bash
+```
 pip install .
 javapack-bridge "My Java Pack.zip" -o out/      # -> out/My Java Pack.mcpack
 javapack-bridge -v pack1.zip pack2.zip          # -v lists skipped files
 ```
 
-## Local Native Build (`.levipack`)
-
-Requirements: Android SDK, Android NDK `28.2.13676358`, CMake `3.22+`, Ninja, PowerShell 7+.
-
-```powershell
-python scripts/generate_mappings.py
-./scripts/package.ps1 -Abi arm64-v8a
-```
+Python 3.9+, no dependencies. Re-converting the same pack keeps the same UUIDs,
+so Bedrock updates the pack instead of installing a duplicate.
 
 ## What converts
 
-| Java Edition | Bedrock Edition |
+| Java | Bedrock |
 |---|---|
 | `pack.mcmeta` / `pack.png` | `manifest.json` / `pack_icon.png` |
-| `textures/block/*` | `textures/blocks/*` + `terrain_texture.json` (remapped names, e.g. `oak_planks` -> `planks_oak`) |
-| `textures/item/*` | `textures/items/*` + `item_texture.json` |
+| `textures/block/*` | `textures/blocks/*` + generated `terrain_texture.json` (names remapped, e.g. `oak_planks` -> `planks_oak`) |
+| `textures/item/*` | `textures/items/*` + generated `item_texture.json` |
 | `.png.mcmeta` block animations | `flipbook_textures.json` |
-| `entity`, `environment`, `colormap`, `particle`, `painting`, `gui`, `models/armor` | copied to matching Bedrock paths |
+| `entity`, `environment`, `colormap`, `particle`, `painting`, `gui`, armor | copied to the matching Bedrock path |
+
+## What does not convert (reported as skipped)
+
+Java models and blockstates, CIT/CEM, sounds, language files, fonts, and shader
+programs. Bedrock has no equivalent format for most of these, and the sound and
+language keys differ between editions. Texture names missing from
+`javapack_bridge/mappings.py` pass through unchanged; if a texture does not show
+up in game, its name probably needs a mapping. PRs adding entries are welcome.
+
+## Status
+
+Tested with synthetic packs only (`pytest`). It has **not** yet been verified in
+game against real packs, so expect gaps in the name tables. See
+[docs/ROADMAP.md](docs/ROADMAP.md) for the planned in-game loader.
