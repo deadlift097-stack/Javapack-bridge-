@@ -15,6 +15,10 @@ set(MOD_LIBRARY_NAME "JavaPackBridge" CACHE STRING "Native library name without 
 set(MOD_MINECRAFT_VERSIONS "[\"1.21.*\", \"1.26.*\"]" CACHE STRING "Raw JSON array for manifest minecraft_versions")
 set(MOD_ICON "icon.png" CACHE STRING "Optional package-relative icon path, such as icon.png")
 
+if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
+    set(CMAKE_POLICY_VERSION_MINIMUM "3.5" CACHE STRING "Minimum CMake policy version for dependencies")
+endif()
+
 include(FetchContent)
 
 FetchContent_Declare(
